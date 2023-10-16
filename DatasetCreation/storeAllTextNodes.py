@@ -8,12 +8,15 @@ from DatasetCreation.helperFunctions import remove_hidden_dir, get_text_nodes
 
 Datapath = '/Users/bmurtuza/Documents/Research/data/swde/SimpDOM'
 vertical = 'auto'
+
+
 def get_text_nodes_details(html_filename, fixedNodes):
     with open(html_filename, 'r') as f:
         html_content = f.read()
     root = DOMTree('xxx', str(html_content)).get_page_root()
     nodes_dict = get_text_nodes(root, fixedNodes)
     return nodes_dict
+
 
 def get_count_of_variable_and_fixed_nodes(nodes_dict):
     count=0
@@ -22,10 +25,11 @@ def get_count_of_variable_and_fixed_nodes(nodes_dict):
             count+=1
     return count, len(nodes_dict)-count
 
+
 def main(Datapath, vertical):
-    websites = remove_hidden_dir(os.listdir('{}/{}'.format(Datapath,vertical)))
+    websites = remove_hidden_dir(os.listdir('{}/{}'.format(Datapath, vertical)))
     print(websites)
-    fixedNodes_filename = '{}/fixedNodes_camera.csv'.format(Datapath)
+    fixedNodes_filename = '{}/fixedNodes_{}.csv'.format(Datapath, vertical)
     fixedNodes = pd.read_csv(fixedNodes_filename,  dtype= str, na_values=str, keep_default_na=False)
     
     for dirname in websites:
@@ -39,11 +43,13 @@ def main(Datapath, vertical):
             page_ID = ''.join(page_ID)
             html_filename = '{}/{}/{}/{}.htm'.format(Datapath,vertical,dirname,page_ID)
             nodesDetails[page_ID] = get_text_nodes_details(html_filename, fixedNodes.loc[fixedNodes.website == website])
-        pickle.dump(nodesDetails, open('{}/nodesDetails/{}.pkl'.format(Datapath, website), 'wb'))
+        with open('{}/nodesDetails/{}.pkl'.format(Datapath, website), 'wb') as f:
+            pickle.dump(nodesDetails, f)
         
         variableAndFixedNodesCounts = [get_count_of_variable_and_fixed_nodes(nodesDetails[page_ID]) for page_ID in nodesDetails.keys()]
         print('avg no. of variable nodes = {}'.format(np.mean(np.array(variableAndFixedNodesCounts), axis=0)))
         print('=====================')
+
 
 if __name__ == "__main__":
     main(Datapath)

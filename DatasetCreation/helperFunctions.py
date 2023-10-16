@@ -1,11 +1,13 @@
 from DatasetCreation.namedTuples import DOMNodeDetails
 
+
 def remove_hidden_dir(websites):
     reduced_list = []
     for website in websites:
         if website[0]!='.':
             reduced_list.append(website)
     return reduced_list
+
 
 def get_text_nodes(root, fixedNodes={}):
     tree = root.getroottree()
